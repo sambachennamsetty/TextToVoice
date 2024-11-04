@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Voice</title>
+</head>
+<body>
+    <h2>Text to Speech Converter</h2>
+    <textarea id="text-input" rows="6" cols="60" placeholder="Enter text here..."></textarea>
+    <br><br>
+    <button onclick="playAudio()">Play</button>
+    <button onclick="downloadAudio()">Download</button>
+    <button onclick="speedUpAudio()">Speed Up</button>
+
+    <audio id="audio-player" controls style="display: none;"></audio>
+
+    <script>
+        function playAudio() {
+            const text = document.getElementById("text-input").value;
+            if (!text) {
+                alert("Please enter some text");
+                return;
+            }
+
+            fetch('/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${encodeURIComponent(text)}`
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const audioPlayer = document.getElementById("audio-player");
+                audioPlayer.src = url;
+                audioPlayer.style.display = "block";
+                audioPlayer.play();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function downloadAudio() {
+            const text = document.getElementById("text-input").value;
+            if (!text) {
+                alert("Please enter some text");
+                return;
+            }
+
+            fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${encodeURIComponent(text)}`
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "output.mp3";
+                a.click();
+                URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function speedUpAudio() {
+            const text = document.getElementById("text-input").value;
+            if (!text) {
+                alert("Please enter some text");
+                return;
+            }
+
+            fetch('/speedup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${encodeURIComponent(text)}`
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const audioPlayer = document.getElementById("audio-player");
+                audioPlayer.src = url;
+                audioPlayer.style.display = "block";
+                audioPlayer.play();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
